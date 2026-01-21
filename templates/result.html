@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作总结汇报</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .report-content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+        }
+        .btn {
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn-secondary {
+            background-color: #2196f3;
+        }
+        .btn-secondary:hover {
+            background-color: #1976d2;
+        }
+        .btn-danger {
+            background-color: #f44336;
+        }
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        .btn-group {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .flash.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .copy-notification {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: fadeOut 3s forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>工作总结汇报生成完成</h1>
+        
+        <!-- 消息提示 -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <!-- 操作按钮 -->
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="copyToClipboard()">复制汇报内容</button>
+            <a href="/download_report/{{ report_filename }}" class="btn">下载Markdown文件</a>
+            <a href="/" class="btn btn-danger">返回首页</a>
+        </div>
+        
+        <!-- 汇报内容 -->
+        <h2>汇报内容</h2>
+        <div class="report-content" id="reportContent">{{ report_content }}</div>
+        
+        <!-- 操作按钮 -->
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="copyToClipboard()">复制汇报内容</button>
+            <a href="/download_report/{{ report_filename }}" class="btn">下载Markdown文件</a>
+            <a href="/" class="btn btn-danger">返回首页</a>
+        </div>
+    </div>
+    
+    <script>
+        // 复制汇报内容
+        function copyToClipboard() {
+            const reportContent = document.getElementById('reportContent').textContent;
+            navigator.clipboard.writeText(reportContent)
+                .then(() => {
+                    // 显示复制成功通知
+                    const notification = document.createElement('div');
+                    notification.className = 'copy-notification';
+                    notification.textContent = '汇报内容已复制到剪贴板！';
+                    document.body.appendChild(notification);
+                    
+                    // 3秒后移除通知
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                })
+                .catch(err => {
+                    console.error('复制失败：', err);
+                    alert('复制失败，请手动复制');
+                });
+        }
+    </script>
+</body>
+</html>

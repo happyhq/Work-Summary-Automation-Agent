@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <fileVersion appName="Calc" lastEdited="6" lowestEdited="6" rupBuild="9309"/>
+  <workbookPr defaultThemeVersion="124226"/>
+  <bookViews>
+    <workbookView xWindow="0" yWindow="0" windowWidth="25600" windowHeight="19200"/>
+  </bookViews>
+  <sheets>
+    <sheet name="Sheet1" sheetId="1" r:id="rId1"/>
+  </sheets>
+  <calcPr calcId="124519" fullCalcOnLoad="true"/>
+  <definedNames>
+    <definedName name="Print_Area" localSheetId="0">$A$1:$G$4</definedName>
+  </definedNames>
+</workbook>

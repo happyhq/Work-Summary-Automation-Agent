@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开源鸿蒙研发团队周工作总结自动化智能体</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-top: 50px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .options {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 50px;
+        }
+        .option-card {
+            text-decoration: none;
+            color: #333;
+            background-color: #e8f5e9;
+            padding: 40px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            min-width: 200px;
+            text-align: center;
+            border: 2px solid #4caf50;
+        }
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .option-card h2 {
+            margin-top: 0;
+            color: #4caf50;
+        }
+        .form-section {
+            margin-top: 50px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-group input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+        .btn {
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .flash.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>开源鸿蒙研发团队周工作总结自动化智能体</h1>
+        
+        <!-- 消息提示 -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <!-- 操作选择 -->
+        <div class="options">
+            <a href="/form" class="option-card">
+                <h2>1. 生成新表单</h2>
+                <p>创建可复用的周工作总结收集表单</p>
+            </a>
+            <div class="option-card" style="cursor: pointer;" onclick="document.getElementById('uploadForm').scrollIntoView();">
+                <h2>2. 解析数据并生成汇报</h2>
+                <p>上传Excel/CSV文件，自动生成工作总结汇报</p>
+            </div>
+        </div>
+        
+        <!-- 数据上传表单 -->
+        <div class="form-section" id="uploadForm">
+            <h2>数据上传</h2>
+            <form method="POST" action="/generate_report" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">选择Excel/CSV文件：</label>
+                    <input type="file" id="file" name="file" accept=".xlsx,.xls,.csv" required>
+                </div>
+                <button type="submit" class="btn">上传并生成汇报</button>
+            </form>
+        </div>
+        
+        <!-- 导出数据选项 -->
+        <div class="form-section">
+            <h2>数据管理</h2>
+            <p>导出已收集的工作数据：</p>
+            <a href="/export_excel" class="btn" style="margin-right: 10px;">导出Excel</a>
+            <a href="/export_csv" class="btn">导出CSV</a>
+        </div>
+    </div>
+</body>
+</html>

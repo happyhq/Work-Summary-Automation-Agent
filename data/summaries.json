@@ -1,0 +1,40 @@
+{
+  "f7ca6ddb-3c7b-40da-baaa-9e5c3fc5aad5": {
+    "name": "黄德俊",
+    "department": "技术研发部",
+    "start_date": "2026-01-19",
+    "end_date": "2026-01-23",
+    "core_work": "1.我是黄德俊",
+    "completion": "1.我是黄德俊",
+    "problems": "1.我是黄德俊",
+    "next_week_plan": "1.我是黄德俊",
+    "id": "f7ca6ddb-3c7b-40da-baaa-9e5c3fc5aad5",
+    "submission_time": "2026-01-20T18:05:38.568428"
+  },
+  "d3bb5d9d-8e33-460f-a47f-5b4be3315b32": {
+    "name": "黄德俊",
+    "department": "技术研发部",
+    "start_date": "2026-01-12",
+    "end_date": "2026-01-16",
+    "core_work": "1、完成了自动化统计工具的编写",
+    "completion": "1、100%完成",
+    "problems": "暂无",
+    "next_week_plan": "1.开红鸿蒙方向的代码编写。",
+    "id": "d3bb5d9d-8e33-460f-a47f-5b4be3315b32",
+    "submission_time": "2026-01-21T11:32:49.615220",
+    "user_id": "2"
+  },
+  "6a8e9249-0ce2-42d9-8c96-a2666943d848": {
+    "name": "用户4",
+    "department": "发东山发发",
+    "start_date": "2026-01-19",
+    "end_date": "2026-01-23",
+    "core_work": "发发发",
+    "completion": "发发大水",
+    "problems": "",
+    "next_week_plan": "发发发",
+    "id": "6a8e9249-0ce2-42d9-8c96-a2666943d848",
+    "submission_time": "2026-01-21T13:14:12.269378",
+    "user_id": "4"
+  }
+}

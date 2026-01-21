@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员仪表盘 - 开源鸿蒙研发团队周工作总结自动化智能体</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        h1, h2, h3 {
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .user-info {
+            font-size: 16px;
+            color: #b0b0b0;
+        }
+        .user-info strong {
+            color: #00d9ff;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00d9ff 0%, #0066ff 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: #333;
+        }
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        .flash-messages {
+            margin-bottom: 30px;
+        }
+        .flash {
+            padding: 14px 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid;
+        }
+        .flash.error {
+            border-left-color: #ff6b6b;
+            color: #f8d7da;
+        }
+        .flash.success {
+            border-left-color: #00d9ff;
+            color: #d4edda;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .option-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .option-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 217, 255, 0.3);
+        }
+        .option-card h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #00d9ff;
+        }
+        .option-card p {
+            margin-bottom: 20px;
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+        .option-card .btn {
+            width: 100%;
+            margin: 0;
+        }
+        .upload-section {
+            margin-top: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .upload-section:hover {
+            border-color: rgba(0, 217, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .upload-section h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #00d9ff;
+        }
+        .upload-section input[type="file"] {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #b0b0b0;
+        }
+        .summary-list {
+            margin-top: 30px;
+        }
+        .summary-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        .summary-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+            border-left: 4px solid #00d9ff;
+        }
+        .summary-item h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #00d9ff;
+            font-weight: 600;
+        }
+        .summary-item p {
+            margin-bottom: 10px;
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+        .summary-meta {
+            font-size: 14px;
+            color: #888;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>管理员仪表盘</h1>
+            <div>
+                <a href="{{ url_for('user_info') }}" class="btn btn-primary">修改信息</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger">退出登录</a>
+            </div>
+        </div>
+        
+        <!-- 消息提示 -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <!-- 用户信息 -->
+        <div class="card">
+            <div class="user-info">
+                <h2>欢迎，{{ user.name }}</h2>
+                <p>手机号：{{ user.phone }}</p>
+                <p>角色：管理员</p>
+            </div>
+        </div>
+        
+        <!-- 系统统计 -->
+        <div class="card">
+            <h3>系统统计</h3>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">
+                        {{ records|length }}
+                    </div>
+                    <div class="stat-label">总提交记录</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">
+                        <!-- 需要计算用户数量 -->
+                        {{ records|map(attribute='user_id')|unique|list|length }}
+                    </div>
+                    <div class="stat-label">提交用户数</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 管理员操作选项 -->
+        <div class="card">
+            <h3>管理员操作</h3>
+            <div class="options">
+                <a href="/create_form" class="option-card">
+                    <h3>1. 生成新表单</h3>
+                    <p>创建可复用的周工作总结收集表单</p>
+                </a>
+                <a href="/generate_report" class="option-card">
+                    <h3>2. 生成汇报</h3>
+                    <p>选择数据来源生成工作总结汇报</p>
+                </a>
+                <a href="/submission_stats" class="option-card">
+                    <h3>3. 查看提交统计</h3>
+                    <p>查看本次提交人员信息和统计</p>
+                </a>
+                <a href="/export_excel" class="option-card">
+                    <h3>4. 导出数据</h3>
+                    <p>导出所有工作数据（Excel/CSV）</p>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 最近提交记录 -->
+        <div class="card">
+            <h3>最近提交记录</h3>
+            <div class="recent-records">
+                {% if records[:5] %}
+                    {% for record in records[:5] %}
+                        <div class="record-item">
+                            <h4>{{ record.name }} - {{ record.start_date }} 至 {{ record.end_date }}</h4>
+                            <div class="record-meta">
+                                提交时间：{{ record.submission_time }}
+                            </div>
+                            <div>
+                                {{ record.core_work[:50] }}{% if record.core_work|length > 50 %}...{% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>暂无提交记录</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

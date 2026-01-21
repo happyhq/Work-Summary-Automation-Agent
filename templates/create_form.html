@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成新表单 - 开源鸿蒙研发团队周工作总结自动化智能体</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #2196f3;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .btn {
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn-secondary {
+            background-color: #2196f3;
+            margin-right: 10px;
+        }
+        .btn-secondary:hover {
+            background-color: #1976d2;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .flash.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .form-info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-info h3 {
+            margin-top: 0;
+            color: #1565c0;
+        }
+        .share-section {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .share-section h3 {
+            margin-top: 0;
+            color: #f57f17;
+        }
+        .share-link {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            word-break: break-all;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+        .copy-btn {
+            background-color: #2196f3;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background-color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>生成新表单</h1>
+        <a href="/admin_dashboard" class="back-link">返回管理员仪表盘</a>
+        
+        <!-- 消息提示 -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <!-- 表单说明 -->
+        <div class="form-info">
+            <h3>表单说明</h3>
+            <p>创建可复用的周工作总结收集表单，设置工作周期后，表单将自动生成分享链接。</p>
+            <p>表单将自动关联到用户历史记录，用户可按周期查看和提交工作内容。</p>
+        </div>
+        
+        <!-- 表单设置 -->
+        <form method="POST" action="/create_form">
+            <div class="form-group">
+                <label for="form_name">表单名称（可选）</label>
+                <input type="text" id="form_name" name="form_name" placeholder="如：2024年第3周工作总结">
+            </div>
+            
+            <div class="form-group">
+                <label for="start_date">工作周期开始日期</label>
+                <input type="date" id="start_date" name="start_date" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="end_date">工作周期结束日期</label>
+                <input type="date" id="end_date" name="end_date" required>
+            </div>
+            
+            <button type="submit" class="btn">生成表单</button>
+            <a href="/admin_dashboard" class="btn btn-secondary">取消</a>
+        </form>
+        
+        <!-- 表单分享链接 -->
+        <div class="share-section">
+            <h3>表单分享链接</h3>
+            <p>分享以下链接给团队成员填写：</p>
+            <div class="share-link">
+                <span id="shareUrl">{{ request.url_root }}form</span>
+                <button class="copy-btn" onclick="copyToClipboard()">复制链接</button>
+            </div>
+            <p><strong>注意：</strong>此链接为固定链接，团队成员可随时访问填写或修改自己的工作内容。</p>
+        </div>
+    </div>
+    
+    <script>
+        // 复制分享链接
+        function copyToClipboard() {
+            const shareUrl = document.getElementById('shareUrl').textContent;
+            navigator.clipboard.writeText(shareUrl)
+                .then(() => {
+                    alert('链接已复制到剪贴板！');
+                })
+                .catch(err => {
+                    console.error('复制失败：', err);
+                    alert('复制失败，请手动复制');
+                });
+        }
+        
+        // 设置默认日期（本周一到本周五）
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
+            const friday = new Date(today);
+            friday.setDate(today.getDate() - today.getDay() + 5 + (today.getDay() === 0 ? -6 : 1));
+            
+            document.getElementById('start_date').value = monday.toISOString().split('T')[0];
+            document.getElementById('end_date').value = friday.toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>

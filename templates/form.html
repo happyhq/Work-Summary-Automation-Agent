@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if edit_id %}修改{% else %}填写{% endif %}本周工作总结 - 开源鸿蒙研发团队周工作总结自动化智能体</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .back-link {
+            text-decoration: none;
+            color: #00d9ff;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(0, 217, 255, 0.1);
+        }
+        .back-link:hover {
+            background: rgba(0, 217, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 10px rgba(0, 217, 255, 0.3);
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        .form-group input[type="text"]:focus,
+        .form-group input[type="date"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00d9ff 0%, #0066ff 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            justify-content: center;
+        }
+        .form-info {
+            background: rgba(0, 217, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #00d9ff;
+        }
+        .form-info h3 {
+            margin-top: 0;
+            color: #00d9ff;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .form-info p {
+            margin-bottom: 10px;
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+        .form-info strong {
+            color: #00d9ff;
+        }
+        .share-section {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #ffd700;
+        }
+        .share-section h3 {
+            margin-top: 0;
+            color: #ffd700;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .share-link {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            word-break: break-all;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b0b0b0;
+        }
+        .copy-btn {
+            background: linear-gradient(135deg, #00d9ff 0%, #0066ff 100%);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+        .copy-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 10px rgba(0, 217, 255, 0.4);
+        }
+        .flash-messages {
+            margin-bottom: 25px;
+        }
+        .flash {
+            padding: 14px 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid;
+        }
+        .flash.error {
+            border-left-color: #ff6b6b;
+            color: #f8d7da;
+        }
+        .flash.success {
+            border-left-color: #00d9ff;
+            color: #d4edda;
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+            .btn-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        .form-error {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid #ff6b6b;
+        }
+        .autosave-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .autosave-indicator.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>周工作总结表单</h1>
+            <a href="/" class="back-link">返回仪表盘</a>
+        </div>
+        
+        <!-- 消息提示 -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <!-- 表单说明 -->
+        <div class="form-info">
+            <h3>表单说明</h3>
+            <p>请如实填写本周工作情况，所有带 * 的字段为必填项。</p>
+            <p>表单将自动关联到您的历史记录，您可以随时修改和更新您的工作内容。</p>
+        </div>
+        
+        <!-- 表单 -->
+        <form id="workSummaryForm">
+            {% if edit_id %}
+                <input type="hidden" name="edit_id" value="{{ edit_id }}">
+            {% endif %}
+            <div class="form-group">
+                <label for="name">姓名 *</label>
+                <input type="text" id="name" name="name" value="{{ form.name.data }}" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label for="department">部门 *</label>
+                <input type="text" id="department" name="department" value="{% if form.department.data %}{{ form.department.data }}{% else %}技术研发部{% endif %}" placeholder="请输入您的部门" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="start_date">本周开始日期 *</label>
+                <input type="date" id="start_date" name="start_date" value="{{ form.start_date.data.strftime('%Y-%m-%d') }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="end_date">本周结束日期 *</label>
+                <input type="date" id="end_date" name="end_date" value="{{ form.end_date.data.strftime('%Y-%m-%d') }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="core_work">本周核心工作内容 *</label>
+                <textarea id="core_work" name="core_work" placeholder="请详细描述本周的核心工作内容" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="completion">完成情况（可量化优先） *</label>
+                <textarea id="completion" name="completion" placeholder="请说明工作完成情况，建议使用可量化的描述，如：完成100%、完成50%等" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="problems">遇到的问题</label>
+                <textarea id="problems" name="problems" placeholder="请描述本周工作中遇到的问题和挑战"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="next_week_plan">下周工作计划 *</label>
+                <textarea id="next_week_plan" name="next_week_plan" placeholder="请详细描述下周的工作计划，聚焦鸿蒙研发方向" required></textarea>
+            </div>
+            
+            <div class="btn-group">
+                <button type="submit" class="btn">提交表单</button>
+                <button type="reset" class="btn btn-danger">重置</button>
+                <a href="/" class="btn btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- 自动保存指示器 -->
+    <div class="autosave-indicator" id="autosaveIndicator">自动保存中...</div>
+    
+    <script>
+        // 表单提交处理
+        document.getElementById('workSummaryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            showAutosaveIndicator('正在提交...');
+            
+            const formData = new FormData(this);
+            
+            fetch('/submit_form', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideAutosaveIndicator();
+                if (data.status === 'success') {
+                    alert('提交成功！');
+                    // 可选：跳转到用户仪表盘
+                    window.location.href = '/';
+                } else {
+                    alert('提交失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                hideAutosaveIndicator();
+                console.error('提交错误：', error);
+                alert('提交失败，请稍后重试');
+            });
+        });
+        
+        // 自动保存功能（简化版）
+        let autosaveTimer;
+        const formFields = ['department', 'core_work', 'completion', 'problems', 'next_week_plan'];
+        
+        formFields.forEach(field => {
+            const element = document.getElementById(field);
+            if (element) {
+                element.addEventListener('input', function() {
+                    clearTimeout(autosaveTimer);
+                    autosaveTimer = setTimeout(() => {
+                        // 这里可以实现真正的自动保存功能
+                        // 目前只是显示提示
+                        showAutosaveIndicator('自动保存中...');
+                        setTimeout(hideAutosaveIndicator, 1000);
+                    }, 2000);
+                });
+            }
+        });
+        
+        // 显示自动保存指示器
+        function showAutosaveIndicator(message) {
+            const indicator = document.getElementById('autosaveIndicator');
+            indicator.textContent = message;
+            indicator.classList.add('visible');
+        }
+        
+        // 隐藏自动保存指示器
+        function hideAutosaveIndicator() {
+            const indicator = document.getElementById('autosaveIndicator');
+            indicator.classList.remove('visible');
+        }
+    </script>
+</body>
+</html>

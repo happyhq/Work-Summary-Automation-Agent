@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提交统计 - 开源鸿蒙研发团队周工作总结自动化智能体</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #333;
+            text-align: center;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #2196f3;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn-secondary {
+            background-color: #2196f3;
+            margin-right: 10px;
+        }
+        .btn-secondary:hover {
+            background-color: #1976d2;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .flash.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .card {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+        .stats-summary {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 120px;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4caf50;
+        }
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .list-section {
+            margin-top: 20px;
+        }
+        .list-section h3 {
+            text-align: left;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .user-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .user-list li {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .submitted {
+            border-left: 4px solid #4caf50;
+        }
+        .not-submitted {
+            border-left: 4px solid #f44336;
+        }
+        .submit-time {
+            font-size: 14px;
+            color: #666;
+        }
+        .period-info {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+        }
+        .period-info h2 {
+            margin-top: 0;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>提交统计</h1>
+        <a href="/admin_dashboard" class="back-link">返回管理员仪表盘</a>
+        
+        <!-- 消息提示 -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <!-- 周期信息 -->
+        <div class="period-info">
+            <h2>当前统计周期</h2>
+            <p>{{ current_period_start }} 至 {{ current_period_end }}</p>
+        </div>
+        
+        <!-- 统计摘要 -->
+        <div class="stats-summary">
+            <div class="stat-item">
+                <div class="stat-number">
+                    {{ submitted_users|length }}
+                </div>
+                <div class="stat-label">已提交</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">
+                    {{ not_submitted_users|length }}
+                </div>
+                <div class="stat-label">未提交</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">
+                    {{ submitted_users|length + not_submitted_users|length }}
+                </div>
+                <div class="stat-label">总用户数</div>
+            </div>
+        </div>
+        
+        <!-- 已提交用户列表 -->
+        <div class="card">
+            <div class="list-section">
+                <h3>已提交用户</h3>
+                {% if submitted_users %}
+                    <ul class="user-list">
+                        {% for user in submitted_users|sort %}
+                            <li class="submitted">
+                                <span>{{ user }}</span>
+                                <span class="submit-time">
+                                    {% if submission_times.get(user) %}
+                                        {{ submission_times[user] }}
+                                    {% else %}
+                                        未知时间
+                                    {% endif %}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>暂无用户提交</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- 未提交用户列表 -->
+        <div class="card">
+            <div class="list-section">
+                <h3>未提交用户</h3>
+                {% if not_submitted_users %}
+                    <ul class="user-list">
+                        {% for user in not_submitted_users|sort %}
+                            <li class="not-submitted">
+                                <span>{{ user }}</span>
+                                <span class="submit-time">未提交</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>所有用户均已提交</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- 返回按钮 -->
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/admin_dashboard" class="btn btn-secondary">返回仪表盘</a>
+        </div>
+    </div>
+</body>
+</html>

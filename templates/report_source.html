@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择数据来源 - 开源鸿蒙研发团队周工作总结自动化智能体</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #2196f3;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        .option-card {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 2px solid #ddd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            border-color: #2196f3;
+        }
+        .option-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .btn {
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .flash.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>生成周工作总结汇报</h1>
+        <a href="/admin_dashboard" class="back-link">返回管理员仪表盘</a>
+        
+        <!-- 消息提示 -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <h2>请选择数据来源</h2>
+        
+        <div class="options">
+            <!-- 选项A：直接读取表单后台数据 -->
+            <div class="option-card" onclick="document.getElementById('source-database').submit()">
+                <h3>A. 直接读取表单后台数据</h3>
+                <p>使用系统中已提交的工作数据生成汇报</p>
+                <form id="source-database" method="POST" action="/generate_report">
+                    <input type="hidden" name="data_source" value="database">
+                </form>
+            </div>
+            
+            <!-- 选项B：上传文件解析 -->
+            <div class="option-card">
+                <h3>B. 上传文件解析</h3>
+                <p>上传Excel或CSV文件生成汇报</p>
+                <form method="POST" action="/generate_report" enctype="multipart/form-data">
+                    <input type="hidden" name="data_source" value="file">
+                    <div class="form-group">
+                        <input type="file" name="file" accept=".xlsx,.xls,.csv" required>
+                    </div>
+                    <button type="submit" class="btn">上传并生成</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

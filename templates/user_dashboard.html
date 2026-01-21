@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户仪表盘 - 开源鸿蒙研发团队周工作总结自动化智能体</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .header h1 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00d9ff 0%, #0066ff 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: linear-gradient(135deg, #00d9ff 0%, #0066ff 100%);
+            color: white;
+        }
+        .btn-sm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 10px rgba(0, 217, 255, 0.4);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        .card h2, .card h3 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .user-info {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .user-info p {
+            margin-bottom: 10px;
+            color: #b0b0b0;
+        }
+        .user-info strong {
+            color: #00d9ff;
+        }
+        .record-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #00d9ff;
+            transition: all 0.3s ease;
+        }
+        .record-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+        .record-item h4 {
+            color: #00d9ff;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .record-meta {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .record-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #b0b0b0;
+        }
+        .record-content strong {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+        .no-records {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .flash-messages {
+            margin-bottom: 30px;
+        }
+        .flash {
+            padding: 14px 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid;
+        }
+        .flash.error {
+            border-left-color: #ff6b6b;
+            color: #f8d7da;
+        }
+        .flash.success {
+            border-left-color: #00d9ff;
+            color: #d4edda;
+        }
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .nav-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .quick-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>周工作总结系统</h1>
+            <div>
+                <a href="{{ url_for('form_page') }}" class="btn btn-primary">填写本周工作总结</a>
+                <a href="{{ url_for('user_info') }}" class="btn btn-primary">修改信息</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger">退出登录</a>
+            </div>
+        </div>
+        
+        <script>
+            // 判断是否为本周
+            function isCurrentWeek(startDate, endDate) {
+                const today = new Date();
+                const currentMonday = new Date(today);
+                currentMonday.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
+                currentMonday.setHours(0, 0, 0, 0);
+                
+                const currentFriday = new Date(currentMonday);
+                currentFriday.setDate(currentMonday.getDate() + 4);
+                currentFriday.setHours(23, 59, 59, 999);
+                
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                return start.getTime() === currentMonday.getTime() && end.getTime() === currentFriday.getTime();
+            }
+        </script>
+        
+        <!-- 消息提示 -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <!-- 用户信息 -->
+        <div class="card">
+            <div class="user-info">
+                <h2>欢迎，{{ user.name }}</h2>
+                <p>手机号：{{ user.phone }}</p>
+                <p>角色：普通用户</p>
+            </div>
+        </div>
+        
+        <!-- 快速操作 -->
+        <div class="card">
+            <h3>快速操作</h3>
+            <a href="/form" class="btn">填写本周工作总结</a>
+        </div>
+        
+        <!-- 历史提交记录 -->
+        <div class="card">
+            <h3>历史提交记录</h3>
+            {% if records %}
+                {% for record in records %}
+                    <div class="record-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4>周期：{{ record.start_date }} 至 {{ record.end_date }}</h4>
+                            {% if record.is_current_week %}
+                                <a href="{{ url_for('form_page', edit_id=record.id) }}" class="btn btn-sm">修改</a>
+                            {% endif %}
+                        </div>
+                        <div class="record-meta">
+                            提交时间：{{ record.submission_time }}
+                        </div>
+                        <div class="record-content">
+                            <strong>核心工作内容：</strong>{{ record.core_work }}<br>
+                            <strong>完成情况：</strong>{{ record.completion }}<br>
+                            {% if record.problems %}
+                                <strong>遇到的问题：</strong>{{ record.problems }}<br>
+                            {% endif %}
+                            <strong>下周工作计划：</strong>{{ record.next_week_plan }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-records">
+                    <p>暂无历史提交记录</p>
+                    <a href="/form" class="btn">立即填写</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
