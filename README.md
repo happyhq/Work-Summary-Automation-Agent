@@ -189,8 +189,8 @@ lsof -i :5001 | grep LISTEN | awk '{print $2}' | xargs kill -9
 ## 技术支持
 
 - **开发团队**：开源鸿蒙研发团队
-- **联系邮箱**：[your-email@example.com]
-- **项目地址**：[your-repository-url]
+- **联系邮箱**：[15828647311@126.com]
+- **项目地址**：[https://github.com/happyhq/Work-Summary-Automation-Agent]
 
 ---
 
