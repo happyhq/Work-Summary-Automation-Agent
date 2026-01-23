@@ -653,6 +653,7 @@ def generate_ai_summary():
         # 从环境变量中获取API KEY
         api_key = os.getenv('ARK_API_KEY')
         
+        # 如果API密钥未配置，返回错误
         if not api_key:
             return jsonify({'error': 'API密钥未配置，请设置ARK_API_KEY环境变量'}), 500
         
@@ -709,20 +710,187 @@ def generate_ai_summary():
         start_time = time.time()
         timeout = 15  # 设置15秒超时，减少等待时间
         
-        try:
-            # 直接使用默认总结，避免API调用超时
-            # 由于火山引擎API响应较慢，为了确保接口稳定性，暂时使用默认总结
-            print("使用默认总结，避免API调用超时")
-            ai_summary = "开源鸿蒙系统研发能力提升第4周工作总结（20260119-20260123）\n上周工作总结：\n\n（1）黄德俊：完成了自动化统计工具的编写，完成情况：100%完成，功能验证通过。遇到的问题：暂无。\n\n（2）用户4：执行\"发发发\"及\"发发大水\"相关工作，完成情况：已按要求执行。遇到的问题：无。\n\n本周工作计划：\n\n（1）黄德俊：开展开源鸿蒙方向的代码编写，聚焦：开源鸿蒙核心功能模块开发。学习/攻坚重点：深入掌握鸿蒙系统API调用及代码架构。\n\n（2）用户4：继续推进\"发发发\"相关任务，聚焦：开源鸿蒙研发辅助工作。学习/攻坚重点：配合团队进行鸿蒙系统基础功能验证。"
-            print(f"默认总结生成成功，长度: {len(ai_summary)} 字符")
+        # 定义动态生成总结的函数
+        def generate_dynamic_summary():
+            print("开始动态生成总结")
+            import re
+            import datetime
+            
+            # 分割文本为工作总结和工作计划两部分
+            report_lines = report_content.strip().split('\n')
+            
+            # 初始化存储结构
+            summary_dict = {}
+            plan_dict = {}
+            
+            # 遍历所有行，提取信息
+            for line in report_lines:
+                line = line.strip()
+                if not line:
+                    continue
                 
+                # 匹配工作总结和工作计划行
+                match = re.match(r'（\d+）\s*(.+?)：(.+)', line)
+                if match:
+                    name = match.group(2).strip()
+                    content = match.group(3).strip()
+                    
+                    # 根据内容判断是工作总结还是计划
+                    if '完成' in content or '遇到的问题' in content:
+                        # 工作总结
+                        if name not in summary_dict:
+                            summary_dict[name] = content
+                    else:
+                        # 工作计划
+                        if name not in plan_dict:
+                            plan_dict[name] = content
+            
+            # 生成日期范围
+            today = datetime.date.today()
+            # 计算本周开始和结束日期（周一到周日）
+            start_of_week = today - datetime.timedelta(days=today.weekday())
+            end_of_week = start_of_week + datetime.timedelta(days=6)
+            # 计算周次（ISO周次）
+            week_number = today.isocalendar()[1]
+            # 格式化为YYYYMMDD格式
+            start_str = start_of_week.strftime("%Y%m%d")
+            end_str = end_of_week.strftime("%Y%m%d")
+            
+            # 生成工作总结部分
+            summary_lines = []
+            for i, (name, content) in enumerate(summary_dict.items(), 1):
+                # 优化工作内容描述，提取完成情况
+                completed = "已完成"
+                if "100%" in content:
+                    completed = "100%完成"
+                elif "完成" in content:
+                    completed = "已完成"
+                
+                # 提取遇到的问题
+                problem = "暂无"
+                if "遇到的问题" in content:
+                    problem_match = re.search(r'遇到的问题：(.+)', content)
+                    if problem_match:
+                        problem = problem_match.group(1).strip().rstrip('。')
+                
+                # 生成工作总结行
+                summary_lines.append(f"（{i}）{name}：{content}（完成情况：{completed}。遇到的问题：{problem}）。")
+            
+            # 生成工作计划部分
+            plan_lines = []
+            for i, (name, content) in enumerate(plan_dict.items(), 1):
+                # 优化工作计划描述，添加聚焦和学习重点
+                focus = "开源鸿蒙研发方向"
+                learning = "深入掌握相关技术"
+                
+                # 根据内容生成更具体的聚焦和学习重点
+                if "代码编写" in content:
+                    focus = "开源鸿蒙代码编写"
+                    learning = "掌握鸿蒙系统API及代码架构"
+                
+                plan_lines.append(f"（{i}）{name}：{content}（聚焦：{focus}，明确学习/攻坚重点：{learning}）。")
+            
+            # 生成最终的AI总结
+            ai_summary = f"开源鸿蒙系统研发能力提升第{week_number}周工作总结（{start_str}-{end_str}）\n上周工作总结：\n\n{chr(10).join(summary_lines)}\n\n本周工作计划：\n\n{chr(10).join(plan_lines)}"
+            
+            print(f"动态生成总结成功，长度: {len(ai_summary)} 字符")
+            return ai_summary
+        
+        try:
+            # 使用火山引擎方舟API生成总结，严格按照官方示例格式
+            print("开始调用火山引擎方舟API生成总结")
+            print(f"模型名称: glm-4-7-251222")
+            print(f"请求内容: {prompt[:50]}...")
+            
+            # 严格按照官方示例调用API，移除不必要的参数
+            response = client.responses.create(
+                model="glm-4-7-251222",
+                input=[{"role": "user", "content": prompt}]
+            )
+            
+            print(f"收到API响应: {response}")
+            print(f"响应类型: {type(response)}")
+            
+            # 提取AI生成的总结
+            ai_summary = ""
+            
+            # 处理响应结构（根据官方示例的响应格式）
+            if hasattr(response, 'output'):
+                print(f"响应包含output属性")
+                output = response.output
+                print(f"output类型: {type(output)}")
+                print(f"output内容: {output}")
+                
+                # 处理output为列表的情况
+                if isinstance(output, list) and len(output) > 0:
+                    print(f"output是列表，长度: {len(output)}")
+                    for item in output:
+                        print(f"处理output列表项: {item}")
+                        print(f"列表项类型: {type(item)}")
+                        
+                        # 尝试从item中获取文本内容
+                        if hasattr(item, 'text') and item.text:
+                            ai_summary += item.text
+                            print(f"从item.text获取内容: 成功")
+                        elif hasattr(item, 'content'):
+                            content = item.content
+                            print(f"item.content类型: {type(content)}")
+                            if isinstance(content, list):
+                                for content_item in content:
+                                    if hasattr(content_item, 'text') and content_item.text:
+                                        ai_summary += content_item.text
+                                        print(f"从content列表项获取text: 成功")
+                            elif content:
+                                ai_summary += str(content)
+                                print(f"从item.content获取内容: 成功")
+                        elif isinstance(item, dict):
+                            if 'text' in item and item['text']:
+                                ai_summary += item['text']
+                                print(f"从字典获取text: 成功")
+                            elif 'content' in item and item['content']:
+                                ai_summary += str(item['content'])
+                                print(f"从字典获取content: 成功")
+                        else:
+                            ai_summary += str(item)
+                            print(f"转换为字符串获取内容: 成功")
+            
+            # 如果API返回的内容为空，使用动态生成的总结
+            if not ai_summary:
+                print("API未返回有效内容，使用动态生成的总结")
+                ai_summary = generate_dynamic_summary()
+            else:
+                print(f"成功从API获取总结，长度: {len(ai_summary)} 字符")
+                print(f"总结内容: {ai_summary[:100]}...")
+            
         except Exception as e:
             import traceback
             error_trace = traceback.format_exc()
-            print(f"AI API调用错误: {str(e)}")
+            print(f"API调用错误: {str(e)}")
+            print(f"错误类型: {type(e).__name__}")
             print(f"错误堆栈: {error_trace}")
-            # 使用默认总结
-            ai_summary = "开源鸿蒙系统研发能力提升第4周工作总结（20260119-20260123）\n上周工作总结：\n\n（1）黄德俊：完成了自动化统计工具的编写，完成情况：100%完成，功能验证通过。遇到的问题：暂无。\n\n（2）用户4：执行\"发发发\"及\"发发大水\"相关工作，完成情况：已按要求执行。遇到的问题：无。\n\n本周工作计划：\n\n（1）黄德俊：开展开源鸿蒙方向的代码编写，聚焦：开源鸿蒙核心功能模块开发。学习/攻坚重点：深入掌握鸿蒙系统API调用及代码架构。\n\n（2）用户4：继续推进\"发发发\"相关任务，聚焦：开源鸿蒙研发辅助工作。学习/攻坚重点：配合团队进行鸿蒙系统基础功能验证。"
+            
+            # 判断错误类型，给出更具体的错误信息
+            error_msg = f"AI总结生成失败: {str(e)}"
+            if "AuthenticationError" in str(e):
+                error_msg = "AI总结生成失败: API密钥无效或未配置，请检查ARK_API_KEY环境变量"
+            elif "Request timed out" in str(e):
+                error_msg = "AI总结生成失败: API调用超时，可能是网络问题或模型服务未开通"
+            elif "ConnectionError" in str(e):
+                error_msg = "AI总结生成失败: 无法连接到API服务器，请检查网络连接"
+            elif "ModelNotFound" in str(e):
+                error_msg = "AI总结生成失败: 模型不存在或未开通，请检查模型名称和权限"
+            
+            print(f"处理后的错误信息: {error_msg}")
+            
+            # 使用动态生成的总结作为fallback
+            try:
+                print("尝试使用动态生成的总结作为替代")
+                ai_summary = generate_dynamic_summary()
+            except Exception as fallback_error:
+                fallback_error_trace = traceback.format_exc()
+                print(f"动态生成总结也失败了: {str(fallback_error)}")
+                print(f"fallback错误堆栈: {fallback_error_trace}")
+                return jsonify({'error': error_msg}), 500
         
         end_time = time.time()
         print(f"处理耗时: {end_time - start_time:.2f} 秒")
